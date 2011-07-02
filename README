@@ -1,3 +1,60 @@
 avmt - android virtual machine touch
+DavidSnooker ~ gmail * com
 
-DavidSnooker@gmail.com
+-- Prerequisites --
+
+Do steps 1-4 before git clone
+
+1. Android SDK
+developer.android.com/sdk
+
+2. Android Kernel
+git clone git://android.git.kernel.org/kernel/common.git
+
+3. ARM Compiler
+www.codesourcery.com/sgpp/lite/arm
+
+4. Goldfish
+cd [KERNEL_ROOT_FOLDER]
+git branch -a
+git checkout remotes/origin/archive/android-gldfish-2.6.29
+cat arch/arm/configs/goldfish_defconfig
+
+5. Compile
+create and start an AVD
+
+cd KERNEL-ROOT-FOLDER
+adb pull /proc/config.gz
+gunzip config.gz
+mv config .config
+
+change 2 lines in Makefile:
+ARCH ?= arm
+CROSS_COMPILE ?= arm-none-linux-gnueabi-
+
+make goldfish_defconfig
+make
+
+on sucess:
+Kernel: arch/arm/boot/zImage is ready
+
+6. Emulator
+ae [AVD] 
+
+-- .bashrc References --
+
+# android alias
+alias make='make -j2'
+alias ae="emulator -no-boot-anim -kernel arch/arm/boot/zImage -ramdisk $ANDROID_IMG/ramdisk.img -show-kernel -avd"
+alias ae-shell="emulator -no-boot-anim -shell -no-window -kernel arch/arm/boot/zImage -ramdisk $ANDROID_IMG/ramdisk.img -show-kernel -avd"
+alias aboot="fastboot boot arch/arm/boot/zImage $ANDROID_IMG/ramdisk.img"
+alias aflash="fastboot flash:raw boot arch/arm/boot/zImage $ANDROID_IMG/ramdisk.img"
+alias aerase="fastboot erase boot"
+
+# android sdk
+export ANDROID_SDK=/usr/local/lib/android-sdk-linux_x86
+export ANDROID_IMG=$ANDROID_SDK/platforms/android-10/images
+export ARM_GNUEABI=~/dev/android/CodeSourcery/Sourcery_G++_Lite
+
+PATH="$PATH:$ANDROID_SDK/tools:$ANDROID_SDK/platform-tools:$ARM_GNUEABI/bin"
+export PATH
