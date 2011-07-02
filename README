@@ -3,16 +3,17 @@ DavidSnooker ~ gmail * com
 
 -- Prerequisites --
 
-Do steps 1-4 before git clone
+Do steps 1-4 before git clone.
+Step 5 is included in the source code. Skip it.
 
 1. Android SDK
-developer.android.com/sdk
+http://developer.android.com/sdk
 
 2. Android Kernel
 git clone git://android.git.kernel.org/kernel/common.git
 
 3. ARM Compiler
-www.codesourcery.com/sgpp/lite/arm
+http://www.codesourcery.com/sgpp/lite/arm
 
 4. Goldfish
 cd [KERNEL_ROOT_FOLDER]
@@ -20,7 +21,7 @@ git branch -a
 git checkout remotes/origin/archive/android-gldfish-2.6.29
 cat arch/arm/configs/goldfish_defconfig
 
-5. Compile
+5. Config & Makefile
 create and start an AVD
 
 cd KERNEL-ROOT-FOLDER
@@ -32,13 +33,14 @@ change 2 lines in Makefile:
 ARCH ?= arm
 CROSS_COMPILE ?= arm-none-linux-gnueabi-
 
+6. Compile
 make goldfish_defconfig
 make
 
 on sucess:
 Kernel: arch/arm/boot/zImage is ready
 
-6. Emulator
+7. Emulator
 ae [AVD] 
 
 -- .bashrc References --
