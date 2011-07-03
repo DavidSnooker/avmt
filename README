@@ -45,18 +45,18 @@ ae [AVD]
 
 -- .bashrc References --
 
-# android alias
-alias make='make -j2'
-alias ae="emulator -no-boot-anim -kernel arch/arm/boot/zImage -ramdisk $ANDROID_IMG/ramdisk.img -show-kernel -avd"
-alias ae-shell="emulator -no-boot-anim -shell -no-window -kernel arch/arm/boot/zImage -ramdisk $ANDROID_IMG/ramdisk.img -show-kernel -avd"
-alias aboot="fastboot boot arch/arm/boot/zImage $ANDROID_IMG/ramdisk.img"
-alias aflash="fastboot flash:raw boot arch/arm/boot/zImage $ANDROID_IMG/ramdisk.img"
-alias aerase="fastboot erase boot"
-
 # android sdk
 export ANDROID_SDK=/usr/local/lib/android-sdk-linux_x86
 export ANDROID_IMG=$ANDROID_SDK/platforms/android-10/images
 export ARM_GNUEABI=~/dev/android/CodeSourcery/Sourcery_G++_Lite
-
 PATH="$PATH:$ANDROID_SDK/tools:$ANDROID_SDK/platform-tools:$ARM_GNUEABI/bin"
 export PATH
+
+# android alias
+alias make='make -j2'
+alias ae="emulator -no-boot-anim -kernel arch/arm/boot/zImage -ramdisk $ANDROID_IMG/ramdisk.img -show-kernel -avd"
+alias aes="emulator -no-boot-anim -shell -no-window -kernel arch/arm/boot/zImage -ramdisk $ANDROID_IMG/ramdisk.img -show-kernel -avd"
+alias aboot="fastboot boot arch/arm/boot/zImage $ANDROID_IMG/ramdisk.img"
+alias aflash="fastboot flash:raw boot arch/arm/boot/zImage $ANDROID_IMG/ramdisk.img"
+alias aerase="fastboot erase boot"
+alias agcc='arm-none-linux-gnueabi-gcc'
