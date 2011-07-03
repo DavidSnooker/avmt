@@ -24,7 +24,7 @@ cat arch/arm/configs/goldfish_defconfig
 5. Config & Makefile
 create and start an AVD
 
-cd KERNEL-ROOT-FOLDER
+cd [KERNEL-ROOT-FOLDER]
 adb pull /proc/config.gz
 gunzip config.gz
 mv config .config
