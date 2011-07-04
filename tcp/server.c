@@ -18,7 +18,6 @@ int main(int argc, char *argv[])
     struct sockaddr_in echoClntAddr; /* Client address */
     unsigned short echoServPort;     /* Server port */
     unsigned int clntLen;            /* Length of client address data structure */
-	unsigned int servLen;
 
     if (argc != 2)     /* Test for correct number of arguments */
     {
@@ -58,11 +57,6 @@ int main(int argc, char *argv[])
             tcp_error("accept() failed");
 
         /* clntSock is connected to a client! */
-	
-		servLen = sizeof(sin);
-		getsockname(servSock, (struct sockaddr *) &sin, &servLen);
-		printf("listening at %s\n", inet_ntoa(sin.sin_addr));
-
         printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
 
         HandleTCPClient(clntSock);

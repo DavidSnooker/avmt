@@ -18,7 +18,10 @@ void HandleTCPClient(int clntSocket)
     /* Send received string and receive again until end of transmission */
     while (recvMsgSize > 0)      /* zero indicates end of transmission */
     {
-        /* Echo message back to client */
+		echoBuffer[recvMsgSize] = '\0';
+		printf("received: %s\n", (char *)&echoBuffer);
+        
+		/* Echo message back to client */
         if (send(clntSocket, echoBuffer, recvMsgSize, 0) != recvMsgSize)
             tcp_error("send() failed");
 

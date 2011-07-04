@@ -71,16 +71,14 @@ aes host
 aes guest
 
 2. Push TCP client and server
-adb -s emulator-5554 push client /data/
-adb -s emulator-5554 shell
-
-adb -s emulator-5556 push server /data/
-adb -s emulator-5556 shell
+cd tcp
+make
+make install
 
 3. TCP forwarding
 adb -s emulator-5556 tcp:7000 tcp:7000
 
 4. Sending from host (client) to guest (server)
-cd /data
-./client 10.0.2.2 [msg] 7000
+adb -s emulator-5556 shell /data/server 7000
+adb -s emulator-5554 shell /data/client 10.0.2.2 [msg] 7000
 
