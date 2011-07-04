@@ -2,22 +2,20 @@ CROSS_COMPILE = arm-none-linux-gnueabi-
 CC = $(CROSS_COMPILE)gcc
 CFLAGS = -static
 
-server_src = server.c error.c handle_client.c
-server_hdr = server.h error.h handle_client.h
+server_src = server.c 
 server_obj = server
 
-client_src = client.c error.c
-client_hdr = client.h error.h
+client_src = client.c
 client_obj = client
 
 obj = $(server_obj) $(client_obj)
 
 all: $(obj)
 
-server: $(server_src) 
+server: $(server_src)
 	$(CC) $(CFLAGS) $^ -o $@
 
-client: $(client_src) 
+client: $(client_src)
 	$(CC) $(CFLAGS) $^ -o $@
 
 clean:

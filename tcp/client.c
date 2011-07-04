@@ -5,74 +5,75 @@
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
 
-#include "client.h"
-#include "error.h"
+#define RCV_BUF_SIZE 32
+#define ECHO_MODE 0 
 
-#define RCVBUFSIZE 32   /* Size of receive buffer */
+int main(int argc, char *argv[]);
+int client (char *serv_ip, unsigned short serv_port, char *clnt_msg);
+void receive(int sock, char *rcvd_msg, unsigned int msg_len);
+void tcp_error(char *errorMessage);
 
-int main(int argc, char *argv[])
-{
-    int sock;                        /* Socket descriptor */
-    struct sockaddr_in echoServAddr; /* Echo server address */
-    unsigned short echoServPort;     /* Echo server port */
-    char *servIP;                    /* Server IP address (dotted quad) */
-    char *echoString;                /* String to send to echo server */
-    char echoBuffer[RCVBUFSIZE];     /* Buffer for echo string */
-    unsigned int echoStringLen;      /* Length of string to echo */
-    int bytesRcvd, totalBytesRcvd;   /* Bytes read in single recv() 
-                                        and total bytes read */
-
-    if ((argc < 3) || (argc > 4))    /* Test for correct number of arguments */
-    {
-       fprintf(stderr, "Usage: %s <Server IP> <Echo Word> [<Echo Port>]\n",
+int main(int argc, char *argv[]) {
+	if (argc != 4) {
+       fprintf(stderr, "Usage: %s <Server IP> <Port> <Message>\n",
                argv[0]);
        exit(1);
     }
+	char *serv_ip = argv[1];
+	unsigned short serv_port = atoi(argv[2]);
+    char *clnt_msg = argv[3];
+	client(serv_ip, serv_port, clnt_msg);
+}
 
-    servIP = argv[1];             /* First arg: server IP address (dotted quad) */
-    echoString = argv[2];         /* Second arg: string to echo */
+int client (char *serv_ip, unsigned short serv_port, char *clnt_msg) {
+    int sock;
+	struct sockaddr_in serv_addr;
+    char rcvd_msg[RCV_BUF_SIZE];
+    unsigned int msg_len;
 
-    if (argc == 4)
-        echoServPort = atoi(argv[3]); /* Use given port, if any */
-    else
-        echoServPort = 7;  /* 7 is the well-known port for the echo service */
-
-    /* Create a reliable, stream socket using TCP */
+	/* create socket */
     if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
         tcp_error("socket() failed");
 
-    /* Construct the server address structure */
-    memset(&echoServAddr, 0, sizeof(echoServAddr));     /* Zero out structure */
-    echoServAddr.sin_family      = AF_INET;             /* Internet address family */
-    echoServAddr.sin_addr.s_addr = inet_addr(servIP);   /* Server IP address */
-    echoServAddr.sin_port        = htons(echoServPort); /* Server port */
+    /* construct serv_addr */
+    memset(&serv_addr, 0, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = inet_addr(serv_ip);
+    serv_addr.sin_port = htons(serv_port);
 
-    /* Establish the connection to the echo server */
-    if (connect(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr)) < 0)
+    /* connect */
+    if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
         tcp_error("connect() failed");
 
-    echoStringLen = strlen(echoString);          /* Determine input length */
+    msg_len = strlen(clnt_msg);
 
-    /* Send the string to the server */
-    if (send(sock, echoString, echoStringLen, 0) != echoStringLen)
+    /* send */
+    if (send(sock, clnt_msg, msg_len, 0) != msg_len)
         tcp_error("send() sent a different number of bytes than expected");
 
-    /* Receive the same string back from the server */
-    totalBytesRcvd = 0;
-    printf("Received: ");                /* Setup to print the echoed string */
-    while (totalBytesRcvd < echoStringLen)
-    {
-        /* Receive up to the buffer size (minus 1 to leave space for
-           a null terminator) bytes from the sender */
-        if ((bytesRcvd = recv(sock, echoBuffer, RCVBUFSIZE - 1, 0)) <= 0)
-            tcp_error("recv() failed or connection closed prematurely");
-        totalBytesRcvd += bytesRcvd;   /* Keep tally of total bytes */
-        echoBuffer[bytesRcvd] = '\0';  /* Terminate the string! */
-        printf("%s", echoBuffer);      /* Print the echo buffer */
-    }
+    /* receive */
+	if (ECHO_MODE)
+		receive(sock, rcvd_msg, msg_len);
 
-    printf("\n");    /* Print a final linefeed */
-
-    close(sock);
+	/* close */
+	close(sock);
     exit(0);
+}
+
+void receive(int sock, char *rcvd_msg, unsigned int msg_len) {
+    int bytes_rcvd, total_bytes_rcvd = 0; 
+    printf("received: ");
+	while (total_bytes_rcvd < msg_len) {
+        if ((bytes_rcvd = recv(sock, rcvd_msg, RCV_BUF_SIZE - 1, 0)) <= 0)
+            tcp_error("recv() failed or connection closed prematurely");
+        total_bytes_rcvd += bytes_rcvd;
+        rcvd_msg[bytes_rcvd] = '\0';
+        printf("%s", rcvd_msg);
+    }
+    printf("\n");
+}
+
+void tcp_error(char *err_msg) {
+    perror(err_msg);
+    exit(1);
 }

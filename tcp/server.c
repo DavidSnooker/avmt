@@ -4,62 +4,97 @@
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
-#include "server.h"
-#include "error.h"
-#include "handle_client.h"
 
-#define MAXPENDING 5    /* Maximum outstanding connection requests */
+#define RCV_BUF_SIZE 32
+#define MAX_PENDING 5
+#define ECHO_MODE 0
 
-int main(int argc, char *argv[])
-{
-    int servSock;                    /* Socket descriptor for server */
-    int clntSock;                    /* Socket descriptor for client */
-    struct sockaddr_in echoServAddr; /* Local address */
-    struct sockaddr_in echoClntAddr; /* Client address */
-    unsigned short echoServPort;     /* Server port */
-    unsigned int clntLen;            /* Length of client address data structure */
+int main(int argc, char *argv[]);
+int server(unsigned short serv_port);
+void handle_client(int clnt_sock);
+void echo(int clnt_sock, char *rcvd_msg, int msg_size); 
+void tcp_error(char *err_msg);
 
-    if (argc != 2)     /* Test for correct number of arguments */
-    {
-        fprintf(stderr, "Usage:  %s <Server Port>\n", argv[0]);
-        exit(1);
-    }
+int main(int argc, char *argv[]) {
+	if (argc != 2) {
+		fprintf(stderr, "Usage:  %s <Server Port>\n", argv[0]);
+		exit(1);
+	}
+	unsigned short serv_port = atoi(argv[1]);
+	server(serv_port);
+}
 
-    echoServPort = atoi(argv[1]);  /* First arg:  local port */
+int server(unsigned short serv_port) {
+	int serv_sock;
+	int clnt_sock;
+	struct sockaddr_in serv_addr;
+	struct sockaddr_in clnt_addr;
+	unsigned int clnt_len;
 
-    /* Create socket for incoming connections */
-    if ((servSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
-        tcp_error("socket() failed");
-      
-    /* Construct local address structure */
-    memset(&echoServAddr, 0, sizeof(echoServAddr));   /* Zero out structure */
-    echoServAddr.sin_family = AF_INET;                /* Internet address family */
-    echoServAddr.sin_addr.s_addr = htonl(INADDR_ANY); /* Any incoming interface */
-    echoServAddr.sin_port = htons(echoServPort);      /* Local port */
+	/* create socket */
+	if ((serv_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+		tcp_error("socket() failed");
 
-    /* Bind to the local address */
-    if (bind(servSock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr)) < 0)
-        tcp_error("bind() failed");
+	/* construct serv_addr */
+	memset(&serv_addr, 0, sizeof(serv_addr));
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	serv_addr.sin_port = htons(serv_port);
 
-    /* Mark the socket so it will listen for incoming connections */
-    if (listen(servSock, MAXPENDING) < 0)
-        tcp_error("listen() failed");
-	
-	struct sockaddr_in sin;
-    for (;;) /* Run forever */
-    {
-        /* Set the size of the in-out parameter */
-        clntLen = sizeof(echoClntAddr);
+	/* bind */
+	if (bind(serv_sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
+		tcp_error("bind() failed");
 
-        /* Wait for a client to connect */
-        if ((clntSock = accept(servSock, (struct sockaddr *) &echoClntAddr, 
-                               &clntLen)) < 0)
-            tcp_error("accept() failed");
+	/* listen */
+	if (listen(serv_sock, MAX_PENDING) < 0)
+		tcp_error("listen() failed");
 
-        /* clntSock is connected to a client! */
-        printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
+	while (1) {
+		clnt_len = sizeof(clnt_addr);
 
-        HandleTCPClient(clntSock);
-    }
-    /* NOT REACHED */
+		/* accept */
+		if ((clnt_sock = accept(serv_sock, 
+			(struct sockaddr *) &clnt_addr, &clnt_len)) < 0)
+			tcp_error("accept() failed");
+
+		/* clnt_sock is connected to a client! */
+		printf("[from %s]\n", inet_ntoa(clnt_addr.sin_addr));
+
+		handle_client(clnt_sock);
+	}
+	/* NOT REACHED */
+}
+
+void handle_client(int clnt_sock) {
+	char rcvd_msg[RCV_BUF_SIZE];
+	int msg_size;
+
+	/* receive */
+	if ((msg_size = recv(clnt_sock, rcvd_msg, RCV_BUF_SIZE, 0)) < 0)
+		tcp_error("recv() failed");
+
+	/* handle */
+	while (msg_size > 0) {
+		rcvd_msg[msg_size] = '\0';
+		printf("received: %s\n", (char *)&rcvd_msg);
+		
+		if (ECHO_MODE)
+			echo(clnt_sock, rcvd_msg, msg_size);
+		
+		if ((msg_size = recv(clnt_sock, rcvd_msg, RCV_BUF_SIZE, 0)) < 0)
+			tcp_error("recv() failed");
+	}
+
+	/* close */
+	close(clnt_sock);
+}
+
+void echo(int clnt_sock, char *rcvd_msg, int msg_size) {
+	if (send(clnt_sock, rcvd_msg, msg_size, 0) != msg_size)
+		tcp_error("send() failed");
+}
+
+void tcp_error(char *err_msg) {
+	perror(err_msg);
+	exit(1);
 }

@@ -16,7 +16,7 @@ git clone git://android.git.kernel.org/kernel/common.git
 http://www.codesourcery.com/sgpp/lite/arm
 
 4. Goldfish
-cd [KERNEL_ROOT_FOLDER]
+cd <KERNEL_ROOT_FOLDER>
 git branch -a
 git checkout remotes/origin/archive/android-gldfish-2.6.29
 cat arch/arm/configs/goldfish_defconfig
@@ -24,7 +24,7 @@ cat arch/arm/configs/goldfish_defconfig
 5. Config & Makefile
 create and start an AVD
 
-cd [KERNEL-ROOT-FOLDER]
+cd <KERNEL-ROOT-FOLDER>
 adb pull /proc/config.gz
 gunzip config.gz
 mv config .config
@@ -41,7 +41,7 @@ on sucess:
 Kernel: arch/arm/boot/zImage is ready
 
 7. Emulator
-ae [AVD] 
+ae <AVD>
 
 -- .bashrc References --
 
@@ -80,5 +80,5 @@ adb -s emulator-5556 forward tcp:7000 tcp:7000
 
 4. Sending from host (client) to guest (server)
 adb -s emulator-5556 shell /data/server 7000
-adb -s emulator-5554 shell /data/client 10.0.2.2 [msg] 7000
+adb -s emulator-5554 shell /data/client 10.0.2.2 7000 <msg>
 
