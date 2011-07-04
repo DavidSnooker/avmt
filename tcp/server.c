@@ -16,20 +16,25 @@ void echo(int clnt_sock, char *rcvd_msg, int msg_size);
 void tcp_error(char *err_msg);
 
 int main(int argc, char *argv[]) {
-	if (argc != 2) {
-		fprintf(stderr, "Usage:  %s <Server Port>\n", argv[0]);
+	/* default port 7000 */
+	unsigned short serv_port = 7000;
+	
+	if (argc < 1 || argc > 2) {
+		fprintf(stderr, "Usage:  %s [Server Port]\n", argv[0]);
 		exit(1);
 	}
-	unsigned short serv_port = atoi(argv[1]);
+	
+	if (argc == 2)
+		serv_port = atoi(argv[1]);
 	server(serv_port);
 }
 
 int server(unsigned short serv_port) {
-	int serv_sock;
-	int clnt_sock;
+	int serv_sock = 0;
+	int clnt_sock = 0;
 	struct sockaddr_in serv_addr;
 	struct sockaddr_in clnt_addr;
-	unsigned int clnt_len;
+	unsigned int clnt_addr_len = 0;
 
 	/* create socket */
 	if ((serv_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
@@ -50,11 +55,11 @@ int server(unsigned short serv_port) {
 		tcp_error("listen() failed");
 
 	while (1) {
-		clnt_len = sizeof(clnt_addr);
+		clnt_addr_len = sizeof(clnt_addr);
 
 		/* accept */
 		if ((clnt_sock = accept(serv_sock, 
-			(struct sockaddr *) &clnt_addr, &clnt_len)) < 0)
+			(struct sockaddr *) &clnt_addr, &clnt_addr_len)) < 0)
 			tcp_error("accept() failed");
 
 		/* clnt_sock is connected to a client! */
@@ -67,7 +72,7 @@ int server(unsigned short serv_port) {
 
 void handle_client(int clnt_sock) {
 	char rcvd_msg[RCV_BUF_SIZE];
-	int msg_size;
+	int msg_size = 0;
 
 	/* receive */
 	if ((msg_size = recv(clnt_sock, rcvd_msg, RCV_BUF_SIZE, 0)) < 0)

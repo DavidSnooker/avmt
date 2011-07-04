@@ -14,22 +14,36 @@ void receive(int sock, char *rcvd_msg, unsigned int msg_len);
 void tcp_error(char *errorMessage);
 
 int main(int argc, char *argv[]) {
-	if (argc != 4) {
-       fprintf(stderr, "Usage: %s <Server IP> <Port> <Message>\n",
+	/* default ip 10.0.2.2, port 7000 */
+	char *serv_ip = "10.0.2.2";
+	unsigned short serv_port = 7000;
+	char *clnt_msg = NULL;
+
+	if (argc < 2 || argc > 4) {
+       fprintf(stderr, "Usage: %s [Server IP] [Port] <Message>\n",
                argv[0]);
        exit(1);
     }
-	char *serv_ip = argv[1];
-	unsigned short serv_port = atoi(argv[2]);
-    char *clnt_msg = argv[3];
+
+	if (argc == 4) {
+		serv_ip = argv[1];
+		serv_port = atoi(argv[2]);
+	    clnt_msg = argv[3];
+	} else if (argc == 3) {
+		serv_ip = argv[1];
+	    clnt_msg = argv[2];
+	} else if (argc == 2) {
+		clnt_msg = argv[1];
+	}
+
 	client(serv_ip, serv_port, clnt_msg);
 }
 
 int client (char *serv_ip, unsigned short serv_port, char *clnt_msg) {
-    int sock;
+    int sock = 0;
 	struct sockaddr_in serv_addr;
     char rcvd_msg[RCV_BUF_SIZE];
-    unsigned int msg_len;
+    unsigned int msg_len = 0;
 
 	/* create socket */
     if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
@@ -61,7 +75,7 @@ int client (char *serv_ip, unsigned short serv_port, char *clnt_msg) {
 }
 
 void receive(int sock, char *rcvd_msg, unsigned int msg_len) {
-    int bytes_rcvd, total_bytes_rcvd = 0; 
+    int bytes_rcvd = 0, total_bytes_rcvd = 0; 
     printf("received: ");
 	while (total_bytes_rcvd < msg_len) {
         if ((bytes_rcvd = recv(sock, rcvd_msg, RCV_BUF_SIZE - 1, 0)) <= 0)

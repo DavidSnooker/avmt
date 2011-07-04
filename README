@@ -79,6 +79,6 @@ make install
 adb -s emulator-5556 forward tcp:7000 tcp:7000
 
 4. Sending from host OS (client) to guest OS (server)
-adb -s emulator-5556 shell /data/server 7000
-adb -s emulator-5554 shell /data/client 10.0.2.2 7000 msg
+adb -s emulator-5556 shell /data/server 
+adb -s emulator-5554 shell /data/client msg
 
