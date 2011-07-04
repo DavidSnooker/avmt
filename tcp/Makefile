@@ -1,31 +1,28 @@
 CROSS_COMPILE = arm-none-linux-gnueabi-
-CC = gcc
+CC = $(CROSS_COMPILE)gcc
+CFLAGS = -static
 
-CFLAGS = -I.
-EXEC = server client
-DEPS = server.h client.h error.h handle_client.h
-SERVER_OBJ = server.o error.o handle_client.o
-CLIENT_OBJ = client.o error.o
-SERVER_SRC = server.c error.c handle_client.c
-CLIENT_SRC = client.c error.c
+server_src = server.c error.c handle_client.c
+server_hdr = server.h error.h handle_client.h
+server_obj = server
 
-arm: $(SERVER_SRC) $(CLIENT_SRC)
-	$(CROSS_COMPILE)$(CC) -static $(SERVER_SRC) -o server
-	$(CROSS_COMPILE)$(CC) -static $(CLIENT_SRC) -o client
-	adb -s emulator-5554 push client /data/
-	adb -s emulator-5556 push server /data/
+client_src = client.c error.c
+client_hdr = client.h error.h
+client_obj = client
 
-%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+obj = $(server_obj) $(client_obj)
 
-all: $(EXEC)
+all: $(obj)
 
-server: $(SERVER_OBJ) 
-	$(CC) -o $@ $^ $(CFLAGS)
+server: $(server_src) 
+	$(CC) $(CFLAGS) $^ -o $@
 
-client: $(CLIENT_OBJ) 
-	$(CC) -o $@ $^ $(CFLAGS)
+client: $(client_src) 
+	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
-	rm -f $(EXEC) *.o *~ *.swp
+	rm -f $(obj) *.o *~ *.swp
 
+install:
+	adb -s emulator-5554 push client /data/
+	adb -s emulator-5556 push server /data/

@@ -60,3 +60,27 @@ alias aboot="fastboot boot arch/arm/boot/zImage $ANDROID_IMG/ramdisk.img"
 alias aflash="fastboot flash:raw boot arch/arm/boot/zImage $ANDROID_IMG/ramdisk.img"
 alias aerase="fastboot erase boot"
 alias agcc='arm-none-linux-gnueabi-gcc'
+
+-- Let 2 emulators talk --
+
+Suppose the AVD for the host and guest OS are 'host' and 'guest' respectively.
+The emulators are 5554 and 5556 respectively.
+
+1. Run the host and guest OS
+aes host
+aes guest
+
+2. Push TCP client and server
+adb -s emulator-5554 push client /data/
+adb -s emulator-5554 shell
+
+adb -s emulator-5556 push server /data/
+adb -s emulator-5556 shell
+
+3. TCP forwarding
+adb -s emulator-5556 tcp:7000 tcp:7000
+
+4. Sending from host (client) to guest (server)
+cd /data
+./client 10.0.2.2 [msg] 7000
+

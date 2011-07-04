@@ -1,0 +1,24 @@
+CC = gcc
+
+CFLAGS = -I.
+EXEC = server client
+DEPS = server.h client.h error.h handle_client.h
+SERVER_OBJ = server.o error.o handle_client.o
+CLIENT_OBJ = client.o error.o
+SERVER_SRC = server.c error.c handle_client.c
+CLIENT_SRC = client.c error.c
+
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+all: $(EXEC)
+
+server: $(SERVER_OBJ) 
+	$(CC) -o $@ $^ $(CFLAGS)
+
+client: $(CLIENT_OBJ) 
+	$(CC) -o $@ $^ $(CFLAGS)
+
+clean:
+	rm -f $(EXEC) *.o *~ *.swp
+
