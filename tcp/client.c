@@ -9,14 +9,16 @@
 #define ECHO_MODE 0 
 
 int main(int argc, char *argv[]);
+int client_default(char *clnt_msg); 
 int client (char *serv_ip, unsigned short serv_port, char *clnt_msg);
 void receive(int sock, char *rcvd_msg, unsigned int msg_len);
 void tcp_error(char *errorMessage);
 
+/* default ip 10.0.2.2, port 7000 */
+char *serv_ip = "10.0.2.2";
+unsigned short serv_port = 7000;
+
 int main(int argc, char *argv[]) {
-	/* default ip 10.0.2.2, port 7000 */
-	char *serv_ip = "10.0.2.2";
-	unsigned short serv_port = 7000;
 	char *clnt_msg = NULL;
 
 	if (argc < 2 || argc > 4) {
@@ -36,6 +38,10 @@ int main(int argc, char *argv[]) {
 		clnt_msg = argv[1];
 	}
 
+	client(serv_ip, serv_port, clnt_msg);
+}
+
+int client_default(char *clnt_msg) {
 	client(serv_ip, serv_port, clnt_msg);
 }
 

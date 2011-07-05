@@ -10,15 +10,16 @@
 #define ECHO_MODE 0
 
 int main(int argc, char *argv[]);
+int server_default(); 
 int server(unsigned short serv_port);
 void handle_client(int clnt_sock);
 void echo(int clnt_sock, char *rcvd_msg, int msg_size); 
 void tcp_error(char *err_msg);
 
+/* default port 7000 */
+unsigned short serv_port = 7000;
+
 int main(int argc, char *argv[]) {
-	/* default port 7000 */
-	unsigned short serv_port = 7000;
-	
 	if (argc < 1 || argc > 2) {
 		fprintf(stderr, "Usage:  %s [Server Port]\n", argv[0]);
 		exit(1);
@@ -27,6 +28,10 @@ int main(int argc, char *argv[]) {
 	if (argc == 2)
 		serv_port = atoi(argv[1]);
 	server(serv_port);
+}
+
+int server_default() {
+	return server(serv_port);
 }
 
 int server(unsigned short serv_port) {
