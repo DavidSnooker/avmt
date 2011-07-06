@@ -96,3 +96,10 @@ With the avmt shell script, part 3 becomes simpler.
 
 3. Sending from host OS (client) to guest OS (server)
 ./avmt send msg
+
+4. Unzip and zip ramdisk
+./avmt unzip-ramdisk
+./avmt zip-ramdisk
+
+Reference:
+http://android-dls.com/wiki/index.php?title=HOWTO:_Unpack%2C_Edit%2C_and_Re-Pack_Boot_Images
