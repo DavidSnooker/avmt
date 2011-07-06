@@ -1,25 +1,20 @@
-#include <stdio.h>      /* for printf() and fprintf() */
-#include <sys/socket.h> /* for socket(), bind(), and connect() */
-#include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
-#include <stdlib.h>     /* for atoi() and exit() */
-#include <string.h>     /* for memset() */
-#include <unistd.h>     /* for close() */
+#include "server.h"
 
 #define RCV_BUF_SIZE 32
 #define MAX_PENDING 5
-#define ECHO_MODE 0
-
-int main(int argc, char *argv[]);
-int server_default(); 
-int server(unsigned short serv_port);
-void handle_client(int clnt_sock);
-void echo(int clnt_sock, char *rcvd_msg, int msg_size); 
-void tcp_error(char *err_msg);
+#define ECHO_MODE 1
+#define DEFAULT_MODE 1
 
 /* default port 7000 */
 unsigned short serv_port = 7000;
 
 int main(int argc, char *argv[]) {
+	if (DEFAULT_MODE) {
+		fprintf(stdout, "avmt server running on guest os at port %d\n", serv_port);
+		server_default();
+		exit(0);
+	}
+
 	if (argc < 1 || argc > 2) {
 		fprintf(stderr, "Usage:  %s [Server Port]\n", argv[0]);
 		exit(1);

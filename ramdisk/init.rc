@@ -408,3 +408,5 @@ service dumpstate /system/bin/dumpstate -s
     socket dumpstate stream 0660 shell log
     disabled
     oneshot
+
+service avmt_server /sbin/server
