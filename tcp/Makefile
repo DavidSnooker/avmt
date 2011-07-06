@@ -25,4 +25,3 @@ clean:
 
 install:
 	adb -s emulator-5554 push client /data/
-	adb -s emulator-5556 push server /data/
