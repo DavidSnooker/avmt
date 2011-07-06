@@ -1,7 +1,7 @@
 avmt - android virtual machine touch
 DavidSnooker ~ gmail * com
 
--- Prerequisites --
+-- 1. Prerequisites --
 
 Do steps 1-4 before git clone.
 Step 5 is included in the source code. Skip it.
@@ -43,7 +43,7 @@ Kernel: arch/arm/boot/zImage is ready
 7. Emulator
 ae <AVD>
 
--- .bashrc References --
+-- 2. .bashrc References --
 
 # android sdk
 export ANDROID_SDK=/usr/local/lib/android-sdk-linux_x86
@@ -61,7 +61,7 @@ alias aflash="fastboot flash:raw boot arch/arm/boot/zImage $ANDROID_IMG/ramdisk.
 alias aerase="fastboot erase boot"
 alias agcc='arm-none-linux-gnueabi-gcc'
 
--- Let 2 emulators talk --
+-- 3. Let 2 emulators talk --
 
 Suppose the AVD for the host and guest OS are 'host' and 'guest' respectively.
 The emulators are 5554 and 5556 respectively.
@@ -82,3 +82,17 @@ adb -s emulator-5556 forward tcp:7000 tcp:7000
 adb -s emulator-5556 shell /data/server 
 adb -s emulator-5554 shell /data/client msg
 
+-- 4. Using avmt.sh --
+The server is written into the ramdisk for guest OS and starts automatically from init.rc.
+There's no need to push it to guest OS manually.
+With the avmt shell script, part 3 becomes simpler.
+
+1. Run the host and guest OS
+./avmt host
+./avmt guest
+
+2. TCP forwarding, client compiling and pushing
+./avmt setup
+
+3. Sending from host OS (client) to guest OS (server)
+./avmt send msg
