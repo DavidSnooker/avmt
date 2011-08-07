@@ -6,11 +6,11 @@ if [ $# -lt 1 ] || [ $# -gt 2 ]; then
 fi
 
 if [ $1 == "host" ]; then
-	emulator -no-boot-anim -shell -no-window -kernel ./guest-os/arch/arm/boot/zImage -ramdisk $ANDROID_IMG/ramdisk.img -show-kernel -avd host
+	emulator -no-boot-anim -shell -no-window -kernel ./host-os/arch/arm/boot/zImage -ramdisk $ANDROID_IMG/ramdisk.img -show-kernel -avd host
 fi
 
 if [ $1 == "guest" ]; then
-	emulator -no-boot-anim -shell -no-window -kernel ./host-os/arch/arm/boot/zImage -ramdisk guest-os-ramdisk.img -show-kernel -avd guest
+	emulator -no-boot-anim -shell -no-window -kernel ./qemu/arch/arm/boot/zImage -ramdisk guest-os-ramdisk.img -show-kernel -avd guest
 fi
 
 if [ $1 == "setup" ]; then
