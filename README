@@ -11,6 +11,8 @@ http://developer.android.com/sdk
 
 2. Android Kernel
 git clone git://android.git.kernel.org/kernel/common.git
+// qemu kernel
+// git clone git://android.git.kernel.org/kernel/qemu.git
 
 3. ARM Compiler
 http://www.codesourcery.com/sgpp/lite/arm
@@ -19,6 +21,8 @@ http://www.codesourcery.com/sgpp/lite/arm
 cd <KERNEL_ROOT_FOLDER>
 git branch -a
 git checkout remotes/origin/archive/android-gldfish-2.6.29
+// qemu kernel
+// git checkout remotes/origin/android-gldfish-2.6.29
 cat arch/arm/configs/goldfish_defconfig
 
 5. Config & Makefile
@@ -28,6 +32,8 @@ cd <KERNEL-ROOT-FOLDER>
 adb pull /proc/config.gz
 gunzip config.gz
 mv config .config
+// qemu kernel
+CONFIG_MODULES=y
 
 change 2 lines in Makefile:
 ARCH ?= arm
