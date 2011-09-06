@@ -24,4 +24,4 @@ clean:
 	rm -f $(obj) *.o *~ *.swp
 
 install:
-	adb -s emulator-5554 push client /data/
+	adb -s emulator-5554 push client /data/local/

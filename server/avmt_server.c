@@ -14,7 +14,7 @@
 
 #define DEFAULT_PORT 7000
 #define CONNECT_PORT 7001
-#define MODULE_NAME "ksocket"
+#define MODULE_NAME "avmt_server"
 //#define INADDR_SEND ((unsigned long int)0x7f000001) /* 127.0.0.1 */
 #define INADDR_SEND INADDR_LOOPBACK
 
@@ -96,11 +96,16 @@ static void ksocket_start(void) {
 
 	/* main loop */
 	for (;;) {
-		memset(&buf, 0, bufsize+1);
+		// memset(&buf, 0, bufsize + 1);
+		memset(buf, 0, bufsize + 1);
+		printk(KERN_INFO MODULE_NAME
+				": buf size = %d\n", bufsize);
 		size = ksocket_receive(kthread->sock, &kthread->addr, buf, bufsize);
 
+		/*
 		if (signal_pending(current))
 			break;
+		*/
 
 		if (size < 0) {
 			printk(KERN_INFO MODULE_NAME
@@ -112,7 +117,8 @@ static void ksocket_start(void) {
 			printk("\n data: %s\n", buf);
 
 			/* sending */
-			memset(&buf, 0, bufsize + 1);
+			// memset(&buf, 0, bufsize + 1);
+			memset(buf, 0, bufsize + 1);
 			strcat(buf, "testing...");
 			ksocket_send(kthread->sock_send, &kthread->addr_send, 
 				buf, strlen(buf));
@@ -162,6 +168,7 @@ int ksocket_send(struct socket *sock, struct sockaddr_in *addr,
 
 int ksocket_receive(struct socket* sock, struct sockaddr_in* addr, 
 	unsigned char* buf, int len) {
+	printk(KERN_INFO MODULE_NAME ": ksocket_receive() called\n");
 	struct msghdr msg;
 	struct iovec iov;
 	mm_segment_t oldfs;
@@ -182,9 +189,13 @@ int ksocket_receive(struct socket* sock, struct sockaddr_in* addr,
 	msg.msg_iovlen = 1;
 	msg.msg_control = NULL;
 
+	printk(KERN_INFO MODULE_NAME ": ksocket_receive() breakpoint 1\n");
 	oldfs = get_fs();
+	printk(KERN_INFO MODULE_NAME ": ksocket_receive() breakpoint 2\n");
 	set_fs(KERNEL_DS);
+	printk(KERN_INFO MODULE_NAME ": ksocket_receive() breakpoint 3\n");
 	size = sock_recvmsg(sock, &msg, len, msg.msg_flags);
+	printk(KERN_INFO MODULE_NAME ": ksocket_receive: size=%d\n", size);
 	set_fs(oldfs);
 
 	return size;

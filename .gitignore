@@ -1,0 +1,6 @@
+*.img
+/guest-os
+/host-os
+/qemu
+/ramdisk
+/test

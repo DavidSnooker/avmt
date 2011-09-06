@@ -8,3 +8,5 @@ all:
 	$(MAKE) -C $(KERNEL) M=$(PWD) modules 
 clean:
 	$(MAKE) -C $(KERNEL) M=$(PWD) clean
+install:
+	adb -s emulator-5556 push avmt_server.ko /data/local/

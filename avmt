@@ -18,11 +18,16 @@ if [ $1 == "setup" ]; then
 	make
 	make install
 	cd ..
+	cd 
+	make
+	make install
+	cd ..
 	adb -s emulator-5556 forward tcp:7000 tcp:7000
+	# adb -s emulator-5556 forward udp:7000 udp:7000
 fi
 
 if [ $1 == "send" ]; then
-	adb -s emulator-5554 shell /data/client $2
+	adb -s emulator-5554 shell /data/local/client $2
 fi	
 
 if [ $1 == "unzip-ramdisk" ]; then
