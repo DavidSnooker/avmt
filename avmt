@@ -18,7 +18,7 @@ if [ $1 == "setup" ]; then
 	make
 	make install
 	cd ..
-	cd 
+	cd server
 	make
 	make install
 	cd ..
